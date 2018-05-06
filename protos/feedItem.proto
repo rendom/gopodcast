@@ -1,0 +1,62 @@
+syntax = "proto3";
+import "google/protobuf/timestamp.proto";
+
+package feedItem;
+
+service FeedItemService {   
+  rpc GetFeedItem (FeedItemRequest) returns (FeedItem) {}
+  rpc GetFeedItems (FeedItemsRequest) returns (stream FeedItemsResponse) {}
+
+  // Keep track of episode duration
+  rpc Listen (FeedItemListenRequest) returns (FeedItemListenResponse) {}
+
+  // Favorite episodes (move this to own service?)
+  rpc AddFavorite (FavoriteRequest) returns (FavoriteResponse) {}
+  rpc RemoveFavorite (FavoriteRequest) returns (FavoriteResponse) {}
+}
+
+message FavoriteResponse {
+  int32 status = 1;
+}
+
+message FavoriteRequest {
+  int32 feed_item_id = 1;
+  int32 user_id = 2;
+}
+
+message FeedItemsRequest {
+  int32 feed_item_id = 1; // Feed id nr
+  string query = 2; // Search string
+  int32 page_number = 3; // Which page
+  int32 result_per_page = 4; // Number of feeds per page.
+
+}
+
+message FeedItemListenRequest {
+  int32 feed_item_id = 1;
+  int32 user_id = 2;
+  int64 current_time = 3;
+}
+
+message FeedItemListenResponse {
+  int32 status = 1;
+}
+
+message FeedItemRequest {
+  int32 feed_id = 1; // Feed id nr
+}
+
+message FeedItemsResponse {
+  repeated FeedItem feed_items = 1;
+}
+
+message FeedItem {    
+  int32 id = 1;
+  string url = 2;
+  string title = 3;
+  string description = 4;
+  string image = 5;
+  // Total subscribers
+  google.protobuf.Timestamp createdAt = 6;
+  google.protobuf.Timestamp updatedAt = 7;
+}

@@ -1,0 +1,4 @@
+Api "In progress", should list all pending episodes (User_id)
+
+Api "New episodes/pending..."  list new episodes hm.. maybe the latest 1-2 from
+each podcast and exlude all episodes you have completed? 

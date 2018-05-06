@@ -1,0 +1,39 @@
+syntax = "proto3";
+import "google/protobuf/timestamp.proto";
+import "feedItem.proto";
+
+package queue;
+
+service Queue {   
+  rpc getQueue (QueueRequest) returns (QueueResponse) {}
+  rpc addFeedItem(addFeedItemRequest) returns (RemoveFeedItemResponse) {}
+  rpc RemoveFeedItem(addFeedItemRequest) returns (RemoveFeedItemResponse) {}
+}
+
+message AddFeedItemResponse {
+  int32 status = 1;
+}
+
+message RemoveFeedItemResponse {
+  int32 status = 1;
+}
+
+message addFeedItemRequest {
+  int32 feed_item_id = 1;
+  int32 user_id = 2;
+}
+
+message QueueRequest {
+}
+
+// Pagination? Stream?
+message QueueResponse {
+  // TODO(fu): Describe this field.
+  repeated QueueItem queue_item = 1;
+}
+
+message QueueItem {
+  int32 id = 1;
+  feedItem.FeedItem feed_item = 2;
+  google.protobuf.Timestamp created_at = 3;
+}
