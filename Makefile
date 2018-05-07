@@ -18,7 +18,7 @@ build:
 	go build -v -o dist/$(BUILD_NAME) $(exe)
 
 build-release:
-	echo "not implemented"
+	@echo "not implemented"
 
 test:
 	go test ./...

@@ -1,0 +1,77 @@
+# Time is an RFC3339 timestamp.
+scalar Time
+
+schema {
+    query: Query
+    mutation: Mutation
+}
+
+type Query {
+    podcasts(): [Podcast!]
+}
+
+type Mutation {
+    # Search podcast
+}
+
+type Podcast {
+    id: ID
+    name: String
+    author: String
+    feed_URL: String
+    feed_type: String
+    description: String
+    image_URL: String
+    # episodesConnection(first: Int, after: ID): PodcastEpisodeConnection!
+    pub_date: Time
+    # categories: [PodcastCategory]
+
+    created_at: Time
+    updated_at: Time
+    latest_fetch: Time
+    #TTL: Int
+    # Genre?
+    # Webiste?..
+}
+
+type PodcastCategory {
+    id: ID
+    name: String
+}
+
+type Episode {
+    id: ID
+    title: String
+    description: String
+    image: String
+    url: String
+}
+
+type User {
+    id: ID
+    name: String
+    podcasts: [Podcast]
+    # Favorite episodes / podcasts?
+    # Pending episodes
+    # Current?
+}
+
+type PodcastEpisodeConnection {
+    totalCount: Int!
+    edges: [PodcastEpisodeEdge]
+    pageInfo: PageInfo!
+}
+
+type PodcastEpisodeEdge {
+    cursor: ID!
+    node: Episode
+}
+
+type PageInfo {
+    startCursor: ID
+    endCursor: ID
+    hasNextPage: Boolean!
+    hasPreviousPage: Boolean!
+}
+
+
