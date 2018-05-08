@@ -2,6 +2,7 @@ package resolver
 
 import (
 	"fmt"
+	"strconv"
 
 	graphql "github.com/graph-gophers/graphql-go"
 	"github.com/rendom/gopodcast/model"
@@ -29,13 +30,12 @@ func (r *Resolver) Podcasts() (*[]*podcastResolver, error) {
 	return &resolvers, nil
 }
 
-func (r *podcastResolver) ID() *graphql.ID {
-	i := graphql.ID(r.p.ID)
-	return &i
+func (r *podcastResolver) ID() graphql.ID {
+	return graphql.ID(strconv.Itoa(r.p.ID))
 }
 
-func (r *podcastResolver) Name() *string {
-	return &r.p.Name
+func (r *podcastResolver) Name() string {
+	return r.p.Name
 }
 
 func (r *podcastResolver) Author() *string {

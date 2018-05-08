@@ -15,8 +15,8 @@ type Mutation {
 }
 
 type Podcast {
-    id: ID
-    name: String
+    id: ID!
+    name: String!
     author: String
     feed_URL: String
     feed_type: String
@@ -35,20 +35,20 @@ type Podcast {
 }
 
 type PodcastCategory {
-    id: ID
+    id: ID!
     name: String
 }
 
 type Episode {
-    id: ID
-    title: String
+    id: ID!
+    title: String!
     description: String
     image: String
     url: String
 }
 
 type User {
-    id: ID
+    id: ID!
     name: String
     podcasts: [Podcast]
     # Favorite episodes / podcasts?
