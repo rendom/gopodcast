@@ -1,0 +1,5 @@
+Debug: true
+DBFile: "dev.sql"
+JWTPublicKeyFile: "jwt.pem"
+JWTPrivateKeyFile: "jwt.key"
+JWTExpire: 500
