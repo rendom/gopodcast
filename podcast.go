@@ -8,7 +8,10 @@ import (
 
 	graphql "github.com/graph-gophers/graphql-go"
 	"github.com/graph-gophers/graphql-go/relay"
+	"github.com/jmoiron/sqlx"
+	_ "github.com/mattn/go-sqlite3"
 	"github.com/rendom/gopodcast/resolver"
+	"github.com/rendom/gopodcast/service"
 )
 
 var schema *graphql.Schema
@@ -29,7 +32,27 @@ func main() {
 		log.Panic(err)
 	}
 
-	schema := graphql.MustParseSchema(s, &resolver.Resolver{})
+	config := GetConfig()
+
+	db, err := sqlx.Connect("sqlite3", config.DBFile)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	if config.Debug {
+		fmt.Printf("Config: %+v\n", config)
+	}
+
+	schema := graphql.MustParseSchema(s, &resolver.Resolver{
+		UserService: &service.User{
+			DB: db,
+		},
+		AuthService: &service.AuthService{
+			PubKey:  config.JWTPublicKeyFile,
+			PrivKey: config.JWTPrivateKeyFile,
+			Expire:  config.JWTExpire,
+		},
+	})
 
 	http.Handle("/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "graphiql.html")

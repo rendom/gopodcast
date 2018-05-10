@@ -11,7 +11,14 @@ type Query {
 }
 
 type Mutation {
-    # Search podcast
+    createUser(name: String!, email: String!, password: String!): String!
+}
+
+type UserInput {
+    id: ID!
+    name: String!
+    email: String!
+    password: String!
 }
 
 type Podcast {
@@ -49,7 +56,9 @@ type Episode {
 
 type User {
     id: ID!
-    name: String
+    name: String!
+    email: String!
+    password: String!
     podcasts: [Podcast]
     # Favorite episodes / podcasts?
     # Pending episodes

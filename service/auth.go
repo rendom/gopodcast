@@ -11,9 +11,9 @@ import (
 )
 
 type AuthService struct {
-	pubKey  string
-	privKey string
-	expire  time.Duration // in hours
+	PubKey  string
+	PrivKey string
+	Expire  time.Duration // in hours
 }
 
 type JwtClaims struct {
@@ -22,7 +22,7 @@ type JwtClaims struct {
 }
 
 func (a *AuthService) getPublicKey() (*rsa.PublicKey, error) {
-	keyData, err := ioutil.ReadFile(a.pubKey)
+	keyData, err := ioutil.ReadFile(a.PubKey)
 
 	if err != nil {
 		return nil, err
@@ -34,7 +34,7 @@ func (a *AuthService) getPublicKey() (*rsa.PublicKey, error) {
 }
 
 func (a *AuthService) getPrivateKey() (*rsa.PrivateKey, error) {
-	keyData, err := ioutil.ReadFile(a.privKey)
+	keyData, err := ioutil.ReadFile(a.PrivKey)
 
 	if err != nil {
 		return nil, err
@@ -85,7 +85,7 @@ func (a *AuthService) CheckToken(ts string) (int, error) {
 }
 
 func (a *AuthService) getClaims(uid int) *JwtClaims {
-	expireTime := time.Now().Add(time.Hour * a.expire).Unix()
+	expireTime := time.Now().Add(time.Hour * a.Expire).Unix()
 	claims := &JwtClaims{
 		UserID:         uid,
 		StandardClaims: &jwt.StandardClaims{ExpiresAt: expireTime},
