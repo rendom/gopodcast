@@ -39,6 +39,8 @@ func main() {
 		log.Fatalln(err)
 	}
 
+	sqlMigrate(db)
+
 	if config.Debug {
 		fmt.Printf("Config: %+v\n", config)
 	}
