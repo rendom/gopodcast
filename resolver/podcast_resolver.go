@@ -1,11 +1,14 @@
 package resolver
 
 import (
+	"context"
+	"errors"
 	"fmt"
 	"strconv"
 
 	graphql "github.com/graph-gophers/graphql-go"
 	"github.com/rendom/gopodcast/model"
+	"github.com/rendom/gopodcast/service"
 )
 
 type podcastResolver struct {
@@ -14,7 +17,11 @@ type podcastResolver struct {
 
 var lol []*podcastResolver
 
-func (r *Resolver) Podcasts() (*[]*podcastResolver, error) {
+func (r *Resolver) Podcasts(ctx context.Context) (*[]*podcastResolver, error) {
+	if ok := ctx.Value(service.ContextAuthIsAuthedKey); ok != true {
+		return nil, errors.New("unauthorized")
+	}
+
 	var resolvers = make([]*podcastResolver, 5)
 	for k, _ := range resolvers {
 		resolvers[k] = &podcastResolver{

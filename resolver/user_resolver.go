@@ -38,8 +38,29 @@ func (r *Resolver) CreateUser(args UserInput) (string, error) {
 	if err != nil {
 		return "", errors.New(
 			`Account created but unable to create login token,
-			Try to login with your new account.`,
+			Try to login with your new account`,
 		)
+	}
+
+	return t, nil
+}
+
+func (r *Resolver) Login(args UserInput) (string, error) {
+	u, err := r.UserService.GetUserByEmail(args.Email)
+	invalidErr := errors.New("Invalid")
+	if err != nil {
+		return "", invalidErr
+	}
+
+	err = u.CheckPassword(args.Password)
+	if err != nil {
+		return "", invalidErr
+	}
+
+	t, err := r.AuthService.CreateToken(u.ID)
+	if err != nil {
+		// Log this
+		return "", errors.New("Unable to create login token, try again later")
 	}
 
 	return t, nil

@@ -43,22 +43,25 @@ func main() {
 		fmt.Printf("Config: %+v\n", config)
 	}
 
+	authService := &service.AuthService{
+		PubKey:  config.JWTPublicKeyFile,
+		PrivKey: config.JWTPrivateKeyFile,
+		Expire:  config.JWTExpire,
+	}
+
 	schema := graphql.MustParseSchema(s, &resolver.Resolver{
 		UserService: &service.User{
 			DB: db,
 		},
-		AuthService: &service.AuthService{
-			PubKey:  config.JWTPublicKeyFile,
-			PrivKey: config.JWTPrivateKeyFile,
-			Expire:  config.JWTExpire,
-		},
+		AuthService: authService,
 	})
 
 	http.Handle("/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "graphiql.html")
 	}))
-
-	http.Handle("/query", &relay.Handler{Schema: schema})
+	http.Handle("/query", authService.Middleware(
+		&relay.Handler{Schema: schema},
+	))
 
 	addr := "localhost:8080"
 	fmt.Println(addr)

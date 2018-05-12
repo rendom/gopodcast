@@ -1,13 +1,22 @@
 package service
 
 import (
+	"context"
 	"crypto/rsa"
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"net/http"
 	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
+)
+
+type key int
+
+const (
+	ContextAuthUIDKey key = iota
+	ContextAuthIsAuthedKey
 )
 
 type AuthService struct {
@@ -92,4 +101,21 @@ func (a *AuthService) getClaims(uid int) *JwtClaims {
 	}
 
 	return claims
+}
+
+func (a *AuthService) Middleware(next http.Handler) http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		token := r.Header.Get("Authorization")
+		uid, err := a.CheckToken(token)
+
+		isAuthed := false
+		if err == nil {
+			isAuthed = true
+		}
+
+		ctx := r.Context()
+		ctx = context.WithValue(ctx, ContextAuthIsAuthedKey, isAuthed)
+		ctx = context.WithValue(ctx, ContextAuthUIDKey, uid)
+		next.ServeHTTP(w, r.WithContext(ctx))
+	})
 }
