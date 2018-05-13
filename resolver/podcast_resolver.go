@@ -3,34 +3,100 @@ package resolver
 import (
 	"context"
 	"errors"
-	"fmt"
+	"log"
 	"strconv"
+	"time"
 
 	graphql "github.com/graph-gophers/graphql-go"
+	"github.com/mmcdole/gofeed"
 	"github.com/rendom/gopodcast/model"
 	"github.com/rendom/gopodcast/service"
 )
 
 type podcastResolver struct {
-	p *model.Podcast
+	p              *model.Podcast
+	EpisodeService *service.Episode
 }
 
-var lol []*podcastResolver
+type NewPodcastInput struct {
+	URL string
+}
+
+func (r *Resolver) AddNewPodcast(ctx context.Context, args NewPodcastInput) (*podcastResolver, error) {
+	if ok := ctx.Value(service.ContextAuthIsAuthedKey); ok != true {
+		return nil, errors.New("unauthorized")
+	}
+
+	pod, err := r.PodcastService.GetPodcastByFeedURL(args.URL)
+	if pod != nil {
+		return &podcastResolver{pod, r.EpisodeService}, nil
+	}
+
+	// var pod *podcast.Podcast
+	// decoder := xml.NewDecoder(resp.Body)
+	// err = decoder.Decode(pod)
+	fp := gofeed.NewParser()
+	feed, err := fp.ParseURL(args.URL)
+	if err != nil {
+		return nil, errors.New("Invalid rss")
+	}
+
+	m := model.Podcast{
+		Name:        feed.Title,
+		Author:      feed.Author.Email,
+		FeedURL:     args.URL,
+		PubDate:     *feed.PublishedParsed,
+		FeedType:    "rss",
+		Description: feed.Description,
+		ImageURL:    feed.Image.URL,
+		CreatedAt:   time.Now(),
+		UpdatedAt:   time.Now(),
+		LatestFetch: time.Now(),
+	}
+
+	err = r.PodcastService.New(&m)
+	if err != nil {
+		return nil, err
+	}
+
+	pod, err = r.PodcastService.GetPodcastByFeedURL(args.URL)
+	if err != nil {
+		return nil, err
+	}
+
+	var episodes []model.Episode
+	for _, v := range feed.Items {
+		episodes = append(
+			episodes,
+			model.Episode{
+				GUID:        v.GUID,
+				Title:       v.Title,
+				Description: v.Description,
+				URL:         v.Enclosures[0].URL,
+			},
+		)
+	}
+	r.EpisodeService.NewBulk(episodes, pod.ID)
+
+	return &podcastResolver{pod, r.EpisodeService}, nil
+}
 
 func (r *Resolver) Podcasts(ctx context.Context) (*[]*podcastResolver, error) {
 	if ok := ctx.Value(service.ContextAuthIsAuthedKey); ok != true {
 		return nil, errors.New("unauthorized")
 	}
 
-	var resolvers = make([]*podcastResolver, 5)
-	for k, _ := range resolvers {
+	podcasts, err := r.PodcastService.GetPodcasts()
+	if err != nil {
+		log.Println(err)
+		return nil, errors.New("Unable to fetch podcasts")
+	}
+
+	var resolvers = make([]*podcastResolver, len(podcasts))
+	for k, v := range podcasts {
 		resolvers[k] = &podcastResolver{
-			p: &model.Podcast{
-				ID:      k,
-				Name:    fmt.Sprintf("Podcast %d", k),
-				Author:  fmt.Sprintf("Skaning %d", k),
-				FeedURL: fmt.Sprintf("https://skaning.com/v%d/rss", k),
-			},
+			&v,
+			r.EpisodeService,
 		}
 	}
 
@@ -79,6 +145,20 @@ func (r *podcastResolver) UpdatedAt() *graphql.Time {
 
 func (r *podcastResolver) LatestFetch() *graphql.Time {
 	return getTime(r.p.UpdatedAt)
+}
+
+func (r *podcastResolver) Episodes() ([]*episodeResolver, error) {
+	episodes, err := r.EpisodeService.GetPodcastEpisodes(r.p.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	var resolvers = make([]*episodeResolver, len(episodes))
+	for k, v := range episodes {
+		resolvers[k] = &episodeResolver{&v}
+	}
+
+	return resolvers, nil
 }
 
 // func (r *podcastResolver) TTL() *int {

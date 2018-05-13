@@ -13,8 +13,8 @@ func (r *episodeResolver) ID() graphql.ID {
 	return graphql.ID(r.e.ID)
 }
 
-func (r *episodeResolver) Title() *string {
-	return &r.e.Title
+func (r *episodeResolver) Title() string {
+	return r.e.Title
 }
 
 func (r *episodeResolver) Description() *string {

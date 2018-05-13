@@ -8,11 +8,16 @@ schema {
 
 type Query {
     podcasts(): [Podcast!]
+    subscriptions(): [Podcast!]
 }
 
 type Mutation {
     createUser(name: String!, email: String!, password: String!): String!
     login(email: String!, password: String!): String!
+
+    addNewPodcast(url: String!): Podcast
+    #subscribe(podcast_id: ID!): String!
+    #unsubscribe(podcast_id: ID!): String!
 }
 
 type UserInput {
@@ -33,6 +38,7 @@ type Podcast {
     # episodesConnection(first: Int, after: ID): PodcastEpisodeConnection!
     pub_date: Time
     # categories: [PodcastCategory]
+    episodes: [Episode]!
 
     created_at: Time
     updated_at: Time
@@ -83,5 +89,3 @@ type PageInfo {
     hasNextPage: Boolean!
     hasPreviousPage: Boolean!
 }
-
-

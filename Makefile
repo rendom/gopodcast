@@ -23,5 +23,8 @@ build-release:
 test:
 	go test ./...
 
+run: build
+	./dist/gopodcast
+
 build-protos:
 	./generateProtos.sh
