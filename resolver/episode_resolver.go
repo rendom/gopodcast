@@ -1,6 +1,8 @@
 package resolver
 
 import (
+	"strconv"
+
 	graphql "github.com/graph-gophers/graphql-go"
 	"github.com/rendom/gopodcast/model"
 )
@@ -10,7 +12,7 @@ type episodeResolver struct {
 }
 
 func (r *episodeResolver) ID() graphql.ID {
-	return graphql.ID(r.e.ID)
+	return graphql.ID(strconv.Itoa(r.e.ID))
 }
 
 func (r *episodeResolver) Title() string {

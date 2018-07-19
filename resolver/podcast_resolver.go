@@ -154,8 +154,8 @@ func (r *podcastResolver) Episodes() ([]*episodeResolver, error) {
 	}
 
 	var resolvers = make([]*episodeResolver, len(episodes))
-	for k, v := range episodes {
-		resolvers[k] = &episodeResolver{&v}
+	for k, _ := range episodes {
+		resolvers[k] = &episodeResolver{&episodes[k]}
 	}
 
 	return resolvers, nil
