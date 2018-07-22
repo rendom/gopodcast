@@ -16,15 +16,21 @@ type Mutation {
     login(email: String!, password: String!): String!
 
     addNewPodcast(url: String!): Podcast
+    subscribe(id: ID!): Subscription
     #subscribe(podcast_id: ID!): String!
     #unsubscribe(podcast_id: ID!): String!
 }
+
 
 type UserInput {
     id: ID!
     name: String!
     email: String!
     password: String!
+}
+
+type Subscription {
+    podcast_id: ID!
 }
 
 type Podcast {

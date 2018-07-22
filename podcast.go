@@ -62,6 +62,9 @@ func main() {
 		EpisodeService: &service.Episode{
 			DB: db,
 		},
+		SubscriptionService: &service.Subscription{
+			DB: db,
+		},
 	})
 
 	http.Handle("/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

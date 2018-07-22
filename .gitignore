@@ -15,6 +15,10 @@
 
 dist/
 
+# Local files for the server cert
+*.key
+*.pem
+
 /service/auth_test.go
 /tmp
 /config.yml

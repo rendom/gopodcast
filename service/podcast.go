@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/rendom/gopodcast/model"
@@ -55,7 +56,7 @@ func (p *Podcast) getPodcastByCol(col string, v string) (*model.Podcast, error) 
 }
 
 func (p *Podcast) GetPodcastById(ID int) (*model.Podcast, error) {
-	return p.getPodcastByCol("id", string(ID))
+	return p.getPodcastByCol("id", strconv.Itoa(ID))
 }
 
 func (p *Podcast) GetPodcastByFeedURL(feed string) (*model.Podcast, error) {
