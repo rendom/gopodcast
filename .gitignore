@@ -22,3 +22,4 @@ dist/
 /service/auth_test.go
 /tmp
 /config.yml
+*.swp
