@@ -9,7 +9,6 @@ LDFLAGS=-ldflags "-w -s -X main.Version=${VERSION} -X main.BuildDate=${BUILD_DAT
 all: test clean build
 
 deps:
-	dep ensure
 
 clean:
 	rm -rf dist/*
